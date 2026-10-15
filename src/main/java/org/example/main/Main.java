@@ -1,45 +1,36 @@
 package org.example.main;
 
+import org.example.model.Employee;
+import org.example.repository.EmployeeRepository;
+import org.example.repository.Repository;
 import org.example.util.DatabaseConnection;
 
 import java.sql.*;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        // Connection myConn = null;
-        // Statement myStamt = null;
-        // ResultSet myRes = null;
+        try (Connection myConn = DatabaseConnection.getInstance()) {
+            Repository<Employee> repository = new EmployeeRepository();
+            // repository.findAll().forEach(System.out::println);
+            System.out.println("---- Listando ----");
+            repository.findAll().forEach(System.out::println);
 
-        // String url = "jdbc:mysql://localhost:3306/project";
-        // String user = "root";
-        // String password = "1234";
+           //System.out.println("----- Actualizando un empleado -------");
+           //Employee employee = new Employee();
+           //employee.setId(7);
+           //employee.setFirst_name("Diego");
+           //employee.setPa_surname("Pimentel");
+           //employee.setMa_surname("Villanueva");
+           //employee.setEmail("diego@example.com");
+           // employee.setSalary(3000F);
 
-        try (
-                // Connection myConn = DriverManager.getConnection(url, user, password);
-                Connection myConn = DatabaseConnection.getInstance();
-                Statement myStamt = myConn.createStatement();
-                ResultSet myRes = myStamt.executeQuery("SELECT * FROM employees");
-                ) {
-            // myConn = DriverManager.getConnection(url, user, password);
-            // myStamt = myConn.createStatement();
-            // myRes = myStamt.executeQuery("SELECT * FROM employees");
+           // repository.save(employee);
 
-            while(myRes.next()) {
-                System.out.println(myRes.getString("first_name"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Algo salio mal!");
-        } /* finally {
-            if (myRes != null) {
-                myRes.close();
-            }
-            if (myStamt != null) {
-                myRes.close();
-            }
-            if (myConn != null) {
-                myRes.close();
-            }
-        } */
+            System.out.println("---- Empleado eliminado! ----");
+            repository.delete(7);
+
+            System.out.println("---- Listando ----");
+            repository.findAll().forEach(System.out::println);
+        }
     }
 }
