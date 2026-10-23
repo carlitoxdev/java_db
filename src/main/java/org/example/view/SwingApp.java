@@ -1,3 +1,4 @@
+/*
 package org.example.view;
 
 import java.awt.*;
@@ -74,17 +75,28 @@ public class SwingApp extends JFrame {
   private void refreshEmployeeTable() {
     // Obtener la lista actualizada de empleados desde la DB
     try {
+      System.out.println("Consultando empleados...");
+
       List<Employee> employees = employeeRepository.findAll();
 
-      // Crear un modelo de tabla y establecer los datos de los empleados
-      DefaultTableModel model = new DefaultTableModel();
+      System.out.println("Empleados encontrados: " + employees.size());
 
-      model.addColumn("ID");
-      model.addColumn("Nombre");
-      model.addColumn("Apellido Paterno");
-      model.addColumn("Apellido Materno");
-      model.addColumn("Email");
-      model.addColumn("Salario");
+      String[] columnas = {
+              "ID",
+              "Nombre",
+              "Apellido Paterno",
+              "Apellido Materno",
+              "Email",
+              "Salario"
+      };
+
+      // Crear un modelo de tabla y establecer los datos de los empleados
+      DefaultTableModel model = new DefaultTableModel(columnas, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+          return false;
+        }
+      };
 
       for (Employee employee : employees) {
         Object[] rowData = {
@@ -101,8 +113,20 @@ public class SwingApp extends JFrame {
 
       // Establecer el modelo de la tabla actualizada
       employeeTable.setModel(model);
+
+      employeeTable.revalidate();
+      employeeTable.repaint();
+
+      System.out.println("Tabla actualizada correctamente!");
     } catch (SQLException e) {
-      JOptionPane.showMessageDialog(this, "Error al obterner los empleados de la DB", "Error", JOptionPane.ERROR_MESSAGE);
+      e.printStackTrace();
+
+      JOptionPane.showMessageDialog(
+              this,
+              "Error al obtener los empleados de la DB\n" + e.getMessage(),
+              "Error",
+              JOptionPane.ERROR_MESSAGE
+      );
     }
   }
 
@@ -199,28 +223,74 @@ public class SwingApp extends JFrame {
   }
 
   private void eliminarEmpleado() {
-    // Obterner el ID del empleado a eliminar
-    String empleadoIdStr = JOptionPane.showInputDialog(this, "Ingrese el ID del empleado a eliminar", "Eliminar Empleado", JOptionPane.QUESTION_MESSAGE);
+    // Obtener el ID del empleado a eliminar
+    String empleadoIdStr = JOptionPane.showInputDialog(
+            this,
+            "Ingrese el ID del empleado a eliminar",
+            "Eliminar Empleado",
+            JOptionPane.QUESTION_MESSAGE
+    );
 
-    if(empleadoIdStr != null) {
-      try {
-        int empleadoId = Integer.parseInt(empleadoIdStr);
+    // Si el usuario cancela o deja le campo vacio
+    if (empleadoIdStr == null || empleadoIdStr.trim().isEmpty()) {
+      return;
+    }
 
-        // Confirmar la eliminacion del empleado
-        int confirmResult = JOptionPane.showConfirmDialog(this, "Esta seguro de eliminar el, empleado", "Confirmar Eliminacion", JOptionPane.YES_NO_OPTION);
+    try {
+      int empleadoId = Integer.parseInt(empleadoIdStr.trim());
 
-        if(confirmResult == JOptionPane.YES_OPTION) {
-          // Eliminar el empleado de la DB
-          employeeRepository.delete(empleadoId);
+      // Verificar que el empleado exista
+      Employee empleado = employeeRepository.getById(empleadoId);
 
-          // Actualizar la tabla de empleados en la interfaz
-          refreshEmployeeTable();
-        }
-      } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Ingrese un valor numerico valido para el ID del empleado", "Error", JOptionPane.ERROR_MESSAGE);
-      } catch(SQLException e) {
-        throw new RuntimeException(e);
+      if (empleado == null) {
+        JOptionPane.showMessageDialog(
+                this,
+                "No se encontro ningun empleado con el ID " + empleadoId,
+                "Empleado no encontrado",
+                JOptionPane.WARNING_MESSAGE
+        );
       }
+
+      // Confirmar la eliminacion
+      int confirmResult = JOptionPane.showConfirmDialog(
+              this,
+              "Esta seguro de eliminar al empleado" + empleado.getFirst_name() + " (ID: " + empleadoId + ")?",
+              "Confirmar eliminacion",
+              JOptionPane.YES_NO_OPTION,
+              JOptionPane.WARNING_MESSAGE
+      );
+
+      if(confirmResult == JOptionPane.YES_OPTION) {
+        // Eliminar el empleado de la DB
+        employeeRepository.delete(empleadoId);
+
+        // Actualizar la tabla de empleados en la interfaz
+        refreshEmployeeTable();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Empleado eliminado correctamente.",
+                "Exito",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+      }
+    } catch (NumberFormatException e) {
+      JOptionPane.showMessageDialog(
+              this,
+              "Ingrese un ID numerico valido.",
+              "Dato inválido",
+              JOptionPane.ERROR_MESSAGE
+      );
+    } catch(SQLException e) {
+      e.printStackTrace();
+
+      JOptionPane.showMessageDialog(
+              this,
+              "Error al eliminar el empleado:\n" + e.getMessage(),
+              "Error de base de datos",
+              JOptionPane.ERROR_MESSAGE
+      );
     }
   }
 }
+*/
